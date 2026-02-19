@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Profile Finder</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #141e30, #243b55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 350px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+h1 {
+  margin-bottom: 15px;
+}
+
+input {
+  width: 70%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 8px 12px;
+  border: none;
+  background: #333;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #555;
+}
+
+.profile {
+  margin-top: 20px;
+}
+
+.profile img {
+  width: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.profile p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>GitHub Finder</h1>
+  <input type="text" id="username" placeholder="Enter GitHub username">
+  <button onclick="getProfile()">Search</button>
+
+  <div class="profile" id="profile"></div>
+</div>
+
+<script>
+async function getProfile() {
+  const username = document.getElementById("username").value.trim();
+  const profileDiv = document.getElementById("profile");
+
+  if (username === "") return;
+
+  profileDiv.innerHTML = "Loading...";
+
+  try {
+    const response = await fetch(`https://api.github.com/users/${username}`);
+    const data = await response.json();
+
+    if (data.message === "Not Found") {
+      profileDiv.innerHTML = "<p>User not found!</p>";
+      return;
+    }
+
+    profileDiv.innerHTML = `
+      <img src="${data.avatar_url}" alt="Avatar">
+      <h3>${data.name || data.login}</h3>
+      <p>${data.bio || ""}</p>
+      <p>Followers: ${data.followers}</p>
+      <p>Following: ${data.following}</p>
+      <p>Public Repos: ${data.public_repos}</p>
+      <a href="${data.html_url}" target="_blank">View Profile</a>
+    `;
+  } catch (error) {
+    profileDiv.innerHTML = "<p>Error fetching data</p>";
+  }
+}
+</script>
+
+</body>
+</html>
